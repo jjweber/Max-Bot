@@ -33,9 +33,10 @@ module.exports = () => {
             console.log("Checking for " + channel.name + " in " + messageContent);
             if(channel.type === "text" && (messageContent.indexOf(channel.name) > 0)) {
               console.log("WILL DO SEND!");
-              console.log(msg);
+              console.log("This is the message we should change", msg.content);
               channel.send("IT WORKS");
             } 
+            
             // if(channel.name === 'bot_spam') channel.send(messageContent);
 
             /*
