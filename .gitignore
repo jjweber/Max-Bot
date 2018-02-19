@@ -1,0 +1,10 @@
+*.env
+.env
+node_modules
+.DS_Store
+*.log
+*.lock
+*.config.js
+db/config/config.json
+package-lock.json
+*.bk
