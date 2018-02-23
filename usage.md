@@ -55,6 +55,13 @@ Example: `!removeAllRoles`
 Removes all roles from the user. _Tabula rasa_, baby.
 
 
+### !broadcastMsg
+
+Example: `!broadcastMsg bot_spam general ~Hello Everyone!`
+
+Broadcasts a message to all specified channels. Following the command enter as many channel names as you want seperated by either a space or comma. Then prefix your message with ~ and it will send it to all matching channels.
+
+
 ## Administrative commands
 
 Max also includes a couple of special commands just for Officers and above for making announcements to multiple channels.

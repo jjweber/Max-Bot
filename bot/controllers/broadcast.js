@@ -1,11 +1,9 @@
 module.exports = () => {
+  const Discord = require('discord.js');
   const util = require('apex-util');
 
   const _run = (message) => {
-    const disallowedRoles = ['admin', 'armada officers', 'armada officer', 'moderator', 'privateers', 'privateer', 'tester', 'crew', 'fleet officer', '@everyone'];
     
-
-
     const ctrls = [
       {
         cmd: '!broadcastMsg',
@@ -18,89 +16,66 @@ module.exports = () => {
         regexSplitCharacter: null,
         allowInDM: false,
         resType: 'dm',
-        action: (message, ctrl, msg) => {
-
+        action: (message) => {
+          // Channels in my guild
           const chnls = message.guild.channels;
-          // console.log("Channels: ", chnls);
+          
+          // String provided
+          const messageContent = message.content;
+          util.log('Getting Message Content: ', messageContent, 4);
 
-          console.log(message.channel.name);
-          let channelNames = [];
-          let messageContent = String;
-          messageContent = message.content;
-          console.log("Content: ", messageContent);
+          // Breaking string up into part to send and part to remove
+          const dissectedMessage = messageContent.split('~');
+          const commandPortionOfMsg = dissectedMessage[0];
+          const portionOfMsgToSend = dissectedMessage[1];
 
-          chnls.map((channel) => {
-            console.log("Checking for " + channel.name + " in " + messageContent);
-            if(channel.type === "text" && (messageContent.indexOf(channel.name) > 0)) {
-              console.log("WILL DO SEND!");
-              console.log("This is the message we should change", msg.content);
-              channel.send("IT WORKS");
-            } 
-            
-            // if(channel.name === 'bot_spam') channel.send(messageContent);
+          // Role check variables
+          const acceptableRoles = ['Admin', 'admin', 'officer'];
+          let isValidRole = false;
 
-            /*
-            console.log("channel: ", channel);
-            s
+          // Looping through the array of acceptable roles.
+          acceptableRoles.map((role) => {
+            util.log('Checking if role is allowed to send message', role, 4);
 
-            for(let i = 0; i < channelNames.length; i++) {
-              const cn = channelNames[i];
+            // Comparing users active roles against this acceptable role iteration. 
+            const modRole = message.guild.roles.find('name', role);
 
-              console.log("Comparing " + cn.name + " to " + channel.name);
-              if (cn.name === channel.name) {
-                channel.send(messageContent);
-              }
-              else {
-                console.log("This channels name was not in the string");
-              }              
+            // If the role matches then an id will be present.
+            if (message.member.roles.has(modRole.id)) {
+              util.log('This is the role that was found on line 39: ', modRole, 4);
+
+              // If id exists the isValidRole will become true.
+              isValidRole = true;
+            } else {
+
+              // isValidRole remains false.
+              return;
             }
-            */
-            // channel.send("TEST");
-          });    
+          })
 
-          console.log("Channel details: ", channelNames);
+          // Checking if user has a valid role to use command.
+          if (isValidRole === true) {
 
-          /*
-          const messageParts = msg;
+            // Looping through the channels.
+            chnls.map((channel) => {
+              util.log('Checking if channel name is in string', channel, 4);
 
-          console.log("msg: ", msg);
+              // Checking if channel is text and if it is found in the string.
+              if(channel.type === "text" && (messageContent.indexOf(channel.name) > 0)) {
+                  util.log('These Channels Where Found In The String: ', channel.name, 4);
 
-          const msgContent = message.content;
-          console.log("Message Content: ", msgContent);
+                  // If channel is in string it will send the message part of the string.
+                  channel.send('"' +  portionOfMsgToSend + '"').catch(console.error);
+              } 
 
-          console.log("Message Parts array: ", messageParts);
-          
-          const channelMsgInput = msg.parsed[1];
-          const channelNameInput = msg.parsed[2];
+            });
 
-          console.log("Message for this channel: ", channelMsgInput);
-          console.log("NEW Channel Name given: ", channelNameInput);
-
-          
-
-          message.channel.send('My Message');
-
-          const channels = message.channel.server;
-          console.log("Channels: ", channels);
-
-          */
-
-          /*
-          const channelNameAndMsg = message.guild.roles.find('name', msg.parsed[1]);
-          console.log('Message: ', message);
-          console.log("Ctrl: ", ctrl);
-          console.log("Msg: ", msg);
-          util.log('Your input for this was. Message:  ', message);
-          */
-          /*
-          message.guild.roles.map((role) => {
-              if (!disallowedRoles.includes(role.name.toLowerCase())) {
-              return roles.push(role.name);
-              }
-              return role.name;
-          });
-          */
-          return 'Take the channel name given and send a message to it: \n\n';
+          } else {
+            // If user role is not allowed max will return a reply to user that they do not have permission to use.
+            return message.reply('You do not have the permission to use this command!').catch(console.error);
+          }
+          // If valid message was sent max will return direct message with the successfully sent message.
+          return 'This is the message that was sent: ' + portionOfMsgToSend + '\n\n';
         }
       },
     ];
@@ -126,6 +101,7 @@ module.exports = () => {
       return msg;
     };
 
+                                                                                                                                                                                                                                                              
     ctrls.map((ctrl) => {
       util.log('Running through controller', ctrl.cmd, 2);
 
